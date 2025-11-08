@@ -4,6 +4,7 @@
 // import { FaSpellCheck, FaSyncAlt, FaCheck, FaPencilAlt } from "react-icons/fa";
 // import { SiGrammarly } from "react-icons/si";
 // import { usePrivy } from "@privy-io/react-auth";
+
 // const Editor = () => {
 //   const { getAccessToken } = usePrivy();
 //   const [text, setText] = useState("");
@@ -33,7 +34,9 @@
 //           },
 //         }
 //       );
-//       setRephrasedSentences(response.data.rephrasedSentences);
+
+//       const cleaned = response.data.result.map((s) => s.replace(/^"|"$/g, ""));
+//       setRephrasedSentences(cleaned);
 //     } catch (error) {
 //       console.error("Error rephrasing sentence:", error);
 //     }
@@ -54,9 +57,12 @@
 //           },
 //         }
 //       );
-//       setSpellCheckedText(response.data.correctedText);
+
+//       const cleanText = response.data.result.replace(/^"|"$/g, "");
+//       setSpellCheckedText(cleanText);
 //     } catch (error) {
 //       console.error("Error checking spelling:", error);
+//       setSpellCheckedText("Spell check failed.");
 //     }
 //   };
 
@@ -64,11 +70,19 @@
 //     try {
 //       const response = await axios.post(
 //         "http://localhost:5000/api/grammarcheck",
-//         { text }
+//         { text },
+//         {
+//           headers: {
+//             Authorization: `Bearer ${await getAccessToken()}`,
+//           },
+//         }
 //       );
-//       setGrammarCheckedText(response.data.correctedText);
+
+//       const cleanText = response.data.result.replace(/^"|"$/g, "");
+//       setGrammarCheckedText(cleanText);
 //     } catch (error) {
 //       console.error("Error checking grammar:", error);
+//       setGrammarCheckedText("Grammar check failed.");
 //     }
 //   };
 
@@ -210,7 +224,6 @@
 // export default Editor;
 import React, { useState } from "react";
 import axios from "axios";
-import Login from "./Login";
 import { FaSpellCheck, FaSyncAlt, FaCheck, FaPencilAlt } from "react-icons/fa";
 import { SiGrammarly } from "react-icons/si";
 import { usePrivy } from "@privy-io/react-auth";
@@ -234,17 +247,12 @@ const Editor = () => {
   const rephraseSentence = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/analyze",
+        `${import.meta.env.VITE_API_BASE_URL}/api/analyze`,
+        { sentence: selectedSentence },
         {
-          sentence: selectedSentence,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${await getAccessToken()}`,
-          },
+          headers: { Authorization: `Bearer ${await getAccessToken()}` },
         }
       );
-
       const cleaned = response.data.result.map((s) => s.replace(/^"|"$/g, ""));
       setRephrasedSentences(cleaned);
     } catch (error) {
@@ -259,15 +267,12 @@ const Editor = () => {
   const checkSpelling = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/spellCheck",
+        `${import.meta.env.VITE_API_BASE_URL}/api/spellCheck`,
         { text },
         {
-          headers: {
-            Authorization: `Bearer ${await getAccessToken()}`,
-          },
+          headers: { Authorization: `Bearer ${await getAccessToken()}` },
         }
       );
-
       const cleanText = response.data.result.replace(/^"|"$/g, "");
       setSpellCheckedText(cleanText);
     } catch (error) {
@@ -279,15 +284,12 @@ const Editor = () => {
   const checkGrammar = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/grammarcheck",
+        `${import.meta.env.VITE_API_BASE_URL}/api/grammarcheck`,
         { text },
         {
-          headers: {
-            Authorization: `Bearer ${await getAccessToken()}`,
-          },
+          headers: { Authorization: `Bearer ${await getAccessToken()}` },
         }
       );
-
       const cleanText = response.data.result.replace(/^"|"$/g, "");
       setGrammarCheckedText(cleanText);
     } catch (error) {
